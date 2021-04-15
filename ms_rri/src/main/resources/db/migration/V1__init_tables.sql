@@ -1,0 +1,28 @@
+create table brand (id  bigserial not null, name varchar(255), description varchar(255), storage_file_id int8, primary key (id));
+create table characteristic (id  bigserial not null, name varchar(255) not null, primary key (id));
+create table collection (id  bigserial not null, name varchar(255) not null, description varchar(255), storage_file_id int8, primary key (id));
+create table collection_products (collection_id int8 not null, product_id int8 not null, primary key (collection_id, product_id));
+create table product (id  bigserial not null, name varchar(255) not null, description varchar(255), description_html text, brand_id int8, created_date timestamp, modified_date timestamp, primary key (id));
+create table product_files (product_id int8 not null, storage_file_id int8 not null, primary key (product_id, storage_file_id));
+create table product_properties_values (product_properties_id int8 not null, value_id int8 not null, primary key (product_properties_id, value_id));
+create table product_properties (id  bigserial not null, product_id int8, characteristic_id int8, primary key (id));
+create table storage_file (id  bigserial not null, file_name varchar(255), file_type varchar(255), file_uri varchar(255), primary key (id));
+create table unit (id  bigserial not null, name varchar(255) not null, primary key (id));
+create table value (id  bigserial not null, name varchar(255), unit_id int8, primary key (id));
+alter table if exists characteristic add constraint UK_characteristic_name unique (name);
+alter table if exists product_files add constraint UK_product_files_storage_file_id unique (storage_file_id);
+alter table if exists product_properties_values add constraint UK_product_properties_values_value_id unique (value_id);
+alter table if exists unit add constraint UK_unit_name unique (name);
+alter table if exists value add constraint FK_value_unit foreign key (unit_id) references unit;
+alter table if exists brand add constraint FK_brand_storage_file foreign key (storage_file_id) references storage_file;
+alter table if exists collection add constraint FK_collection_storage_file foreign key (storage_file_id) references storage_file;
+alter table if exists collection_products add constraint FK_collection_products_product foreign key (product_id) references product;
+alter table if exists collection_products add constraint FK_collection_products_collection foreign key (collection_id) references collection;
+alter table if exists product add constraint FK_product_brand foreign key (brand_id) references brand;
+alter table if exists product_files add constraint FK_product_files_storage_file foreign key (storage_file_id) references storage_file;
+alter table if exists product_files add constraint FK_product_files_product foreign key (product_id) references product;
+alter table if exists product_properties_values add constraint FK_product_properties_values_value foreign key (value_id) references value;
+alter table if exists product_properties_values add constraint FK_product_properties_values_product_properties foreign key (product_properties_id) references product_properties;
+alter table if exists product_properties add constraint FK_product_properties_characteristic foreign key (characteristic_id) references characteristic;
+alter table if exists product_properties add constraint FK_product_properties_product foreign key (product_id) references product;
+
